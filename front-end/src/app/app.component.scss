@@ -1,0 +1,15 @@
+.add-button {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+  font-size: 3rem;
+}
+
+.container {
+  padding-block-start: 2rem;
+  width: 100vw;
+  display: grid;
+  gap: 3rem;
+  justify-content: center;
+  align-items: center;
+}

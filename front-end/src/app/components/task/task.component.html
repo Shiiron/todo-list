@@ -1,0 +1,56 @@
+<div class="task-container">
+  <mat-list>
+    @if (taskState().tasks.length > 0) {
+      <mat-divider></mat-divider>
+    }
+
+    @for (task of taskState().tasks; track $index) {
+      <mat-list-item>
+        <div class="task">
+          <div>{{task.description}}</div>
+          <div style="display: flex; gap: 1rem;">
+            <!--
+            <button mat-flat-button aria-label="Modifier la tâche">
+              Modifier
+            </button>
+            -->
+            <button mat-flat-button aria-label="supprimer la tâche" (click)="deleteTask(task.ID)">
+              Supprimer
+            </button>
+          </div>
+        </div>
+      </mat-list-item>
+      <mat-divider></mat-divider>
+    }
+
+    @if (this.listState().selectedList) {
+      <div style="display: flex;">
+        <button
+          mat-fab
+          aria-label="Add new list"
+          class="add-list"
+          (click)="toggleAdd()">
+          @if (this.displayAddTask()) {
+            x
+          }
+
+          @if (!this.displayAddTask()) {
+            +
+          }
+        </button>
+
+      @if (this.displayAddTask()) {
+        <form [formGroup]="addTask" (ngSubmit)="submit()">
+          <mat-form-field>
+            <mat-label>Description de la tache</mat-label>
+            <input matInput name="description" formControlName="description">
+          </mat-form-field>
+
+          <input mat-flat-button type="submit" />
+        </form>
+      }
+    </div>
+    }
+
+  </mat-list>
+</div>
