@@ -1,4 +1,25 @@
-.add-list {
-  font-size: 3rem;
-  margin-inline-start: 2rem;
+.list-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 25rem);
+  gap: 2rem;
+}
+
+.list {
+  border-radius: 25px;
+  border: 3px var(--dark-blue) solid;
+  display: grid;
+  grid-template-rows: max-content 1fr max-content;
+}
+
+.list-title {
+  padding: 1rem;
+  font-weight: 700;
+  color: var(--dark-blue);
+}
+
+.list-footer {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
 }

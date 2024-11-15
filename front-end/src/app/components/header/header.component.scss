@@ -1,0 +1,28 @@
+.todo-header {
+  background-color: var(--dark-blue);
+  height: 5rem;
+  display: grid;
+  grid-template-columns: min(40px) 1fr min(40px);
+  justify-content: center;
+  align-items: center;
+  color: white;
+  padding-inline: 1rem;
+  box-shadow: 0 4px 4px 0 grey;
+}
+
+.header-title {
+  font-weight: bold;
+  text-align: center;
+  font-size: 2rem;
+}
+
+button {
+  background-color: white;
+  color: var(--dark-blue);
+  transition: all 0.3s ease-in;
+
+  &:hover {
+    color: white;
+    background-color: var(--orange);
+  }
+}

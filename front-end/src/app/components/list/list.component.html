@@ -1,42 +1,32 @@
-<div class="align">
-  <mat-form-field>
-    <mat-label>Select an option</mat-label>
-    <mat-select [(value)]="selectedList" (selectionChange)="onChange($event.value)">
-      <mat-option>Aucune</mat-option>
-      @for (list of lists; track $index) {
-        <mat-option value="{{list.ID}}">{{list.name}}</mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
+<div class="list-container">
+  @for (list of lists$ | async; track $index) {
+    <div class="list">
+      <div class="list-title">
+        {{ list.name }}
+      </div>
+      <div class="list-task-container">
+        @for (task of list.tasks; track $index) {
+          <app-task [task]="task"></app-task>
+        }
 
-    <button mat-fab aria-label="Add new list" class="add-list" (click)="toggleAdd()">
-      @if (this.displayAddList()) {
-        x
-      }
+        @if (this.addTask()) {
+          <div>
+            <form [formGroup]="addList" (ngSubmit)="submit()">
+              <mat-form-field>
+                <mat-label>Nom de la liste</mat-label>
+                <input matInput name="name" formControlName="name">
+              </mat-form-field>
 
-      @if (!this.displayAddList()) {
-        +
-      }
-    </button>
+              <input mat-flat-button type="submit" />
+            </form>
+          </div>
+        }
+      </div>
 
-    @if (this.listState().selectedList && !this.displayAddList()) {
-      <button
-        mat-fab
-        aria-label="Delete list"
-        class="add-list"
-        (click)="deleteList()">
-        x
-      </button>
-    }
+      <div class="list-footer">
+        <!-- <button mat-raised-button>Voir plus</button> -->
+        <button mat-raised-button (click)="toggleAddTask()">Ajouter une tâche</button>
+      </div>
+    </div>
+  }
 </div>
-
-@if (this.displayAddList()) {
-  <form [formGroup]="addList" (ngSubmit)="submit()">
-    <mat-form-field>
-      <mat-label>Nom de la liste</mat-label>
-      <input matInput name="name" formControlName="name">
-    </mat-form-field>
-
-    <input mat-flat-button type="submit" />
-  </form>
-}

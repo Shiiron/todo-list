@@ -1,15 +1,18 @@
-import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { TodoListService } from 'src/app/services/todo-list.service';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule} from '@angular/material/input';
+import { MatDividerModule } from '@angular/material/divider';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { TodoTask } from 'src/app/model/task';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { List } from 'src/app/model/list';
 import { TodoTaskService } from 'src/app/services/todo-task.service';
-import { delay } from 'rxjs';
+import { catchError, delay, EMPTY, forkJoin, map, mergeMap, Observable, tap } from 'rxjs';
+import { TodoTask } from 'src/app/model/task';
+import { AsyncPipe } from '@angular/common';
+import { TaskComponent } from '../task/task.component';
 
 @Component({
   selector: 'app-list',
@@ -20,7 +23,10 @@ import { delay } from 'rxjs';
     MatFormFieldModule,
     MatButtonModule,
     ReactiveFormsModule,
-    MatInputModule
+    MatInputModule,
+    AsyncPipe,
+    TaskComponent,
+    MatDividerModule
   ],
   styleUrls: ['./list.component.scss']
 })
@@ -28,77 +34,36 @@ export class ListComponent {
   listService = inject(TodoListService);
   taskService = inject(TodoTaskService);
   addList: FormGroup;
-  displayAddList = signal(false);
-  listState = this.listService.listState;
-  lists: List[] = [];
+  addTask = signal(false);
+  lists$: Observable<List[]>;
   selectedList: number;
+  error: string;
 
   constructor(
     private formBuilder: FormBuilder,
     private destroyRef: DestroyRef
   ) {
-    this.listService.getList()
-      .pipe(takeUntilDestroyed())
-      .subscribe({
-        next: lists => this.lists = lists,
-        error: err => console.log(err)
-      });
+      this.lists$ = this.listService.getList()
+        .pipe(
+          mergeMap(lists =>
+            forkJoin(lists.map(list =>
+              this.taskService.getTask(list.ID)
+              .pipe(
+                map(tasks => ({
+                  ID: list.ID,
+                  name: list.name,
+                  tasks: tasks.map(t => ({ID: t.ID, description: t.description}) as TodoTask)
+                }) as List)
+              )
+            )
+          )),
+          takeUntilDestroyed()
+        )
   }
 
-  onChange(value) {
-    this.listService.setCurrentList(value);
-    this.taskService.getTask(value)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        delay(1000))
-      .subscribe({
-        next: tasks => this.taskService.setTasks(tasks),
-        error: err => console.log(err)
-      })
+  toggleAddTask() {
+    this.addTask.set(!this.addTask());
   }
 
-  toggleAdd() {
-    this.displayAddList.set(!this.displayAddList());
-
-    if (this.displayAddList()) {
-      this.addList = this.formBuilder.group({
-        name: ['']
-      })
-    } else {
-      this.addList = null;
-    }
-  }
-
-  submit() {
-    const newList: List = {
-      ID: null,
-      name: this.addList.value['name']
-    }
-
-    this.listService.addList(newList.name)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (list: any) => {
-          newList.ID = list.id;
-          this.toggleAdd();
-          this.lists.push(newList);
-          this.listService.setLists(this.lists);
-        },
-        error: err => console.log(err)
-      })
-  }
-
-  deleteList() {
-    this.listService.deleteList(this.listState().selectedList)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.lists = this.lists.filter((list) => list.ID !== +this.selectedList);
-          this.selectedList = null;
-          this.listService.setLists(this.lists);
-          this.listService.setCurrentList(null);
-        },
-        error: err => console.log(err)
-      })
-  }
+  submit() {}
 }
