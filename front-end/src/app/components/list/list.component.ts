@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, Signal, signal } from '@angular/core';
 import { TodoListService } from 'src/app/services/todo-list.service';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -6,13 +6,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule} from '@angular/material/input';
 import { MatDividerModule } from '@angular/material/divider';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { List } from 'src/app/model/list';
 import { TodoTaskService } from 'src/app/services/todo-task.service';
-import { catchError, delay, EMPTY, forkJoin, map, mergeMap, Observable, tap } from 'rxjs';
-import { TodoTask } from 'src/app/model/task';
-import { AsyncPipe } from '@angular/common';
 import { TaskComponent } from '../task/task.component';
+import { MatIconModule } from '@angular/material/icon';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-list',
@@ -24,46 +23,38 @@ import { TaskComponent } from '../task/task.component';
     MatButtonModule,
     ReactiveFormsModule,
     MatInputModule,
-    AsyncPipe,
     TaskComponent,
-    MatDividerModule
+    MatDividerModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    NgIf
   ],
   styleUrls: ['./list.component.scss']
 })
 export class ListComponent {
-  listService = inject(TodoListService);
+  todoListService = inject(TodoListService);
   taskService = inject(TodoTaskService);
   addList: FormGroup;
   addTask = signal(false);
-  lists$: Observable<List[]>;
+  lists = this.todoListService.todoLists;
+  isLoading = this.todoListService.isLoading;
   selectedList: number;
   error: string;
 
   constructor(
     private formBuilder: FormBuilder,
     private destroyRef: DestroyRef
-  ) {
-      this.lists$ = this.listService.getList()
-        .pipe(
-          mergeMap(lists =>
-            forkJoin(lists.map(list =>
-              this.taskService.getTask(list.ID)
-              .pipe(
-                map(tasks => ({
-                  ID: list.ID,
-                  name: list.name,
-                  tasks: tasks.map(t => ({ID: t.ID, description: t.description}) as TodoTask)
-                }) as List)
-              )
-            )
-          )),
-          takeUntilDestroyed()
-        )
-  }
+  ) {}
 
   toggleAddTask() {
     this.addTask.set(!this.addTask());
   }
 
-  submit() {}
+  submit() {
+    this.addTask.set(false);
+  }
+
+  deleteList(list: List) {
+    this.todoListService.deleteList(list);
+  }
 }

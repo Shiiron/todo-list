@@ -3,8 +3,18 @@
   <div></div>
   <div class="header-title">TODO Lists</div>
   <div>
-    <button mat-icon-button>
+    <button mat-icon-button (click)="this.todoListService.toggleAddList.set(true)">
       <mat-icon>add</mat-icon>
     </button>
   </div>
 </header>
+
+@if(this.todoListService.toggleAddList()) {
+  <form class="add-list-form" [formGroup]="addListForm" (ngSubmit)="createList()">
+    <mat-form-field>
+      <mat-label>Nom de la liste</mat-label>
+      <input matInput name="name" formControlName="name">
+    </mat-form-field>
+    <input type="submit">
+  </form>
+}

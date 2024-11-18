@@ -1,8 +1,18 @@
-<div class="list-container">
-  @for (list of lists$ | async; track $index) {
+@if(this.isLoading()) {
+  <div style="display: flex; justify-content: center; align-items: center;">
+    <mat-spinner></mat-spinner>
+  </div>
+}
+
+
+<div *ngIf="!isLoading()" class="list-container">
+  @for (list of lists(); track $index) {
     <div class="list">
       <div class="list-title">
         {{ list.name }}
+        <button mat-icon-button (click)="deleteList(list)">
+          <mat-icon>close</mat-icon>
+        </button>
       </div>
       <div class="list-task-container">
         @for (task of list.tasks; track $index) {
@@ -25,7 +35,7 @@
 
       <div class="list-footer">
         <!-- <button mat-raised-button>Voir plus</button> -->
-        <button mat-raised-button (click)="toggleAddTask()">Ajouter une tâche</button>
+        <!-- <button mat-raised-button (click)="toggleAddTask()">Ajouter une tâche</button> -->
       </div>
     </div>
   }
