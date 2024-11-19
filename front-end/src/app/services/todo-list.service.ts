@@ -1,7 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { List } from '../model/list';
-import { catchError, delay, forkJoin, map, mergeMap, Observable, of, Subject, switchMap, tap } from 'rxjs';
+import { catchError, concat, concatMap, delay, forkJoin, map, mergeMap, Observable, of, Subject, switchMap, tap } from 'rxjs';
 import { environment } from 'src/environment/environment';
 import { TodoTaskService } from './todo-task.service';
 import { TodoTask } from '../model/task';
@@ -38,21 +38,24 @@ export class TodoListService {
       .pipe(
         tap(() => this.setLoading(true)),
         switchMap((list: List) => this.updateList(list)),
-        switchMap(() => this.getList()),
+        switchMap((id: {id: number}) => this.getList(id.id)),
         takeUntilDestroyed(),
       ).subscribe(list => {
-        this.setLists(list);
+        this.addToList(list);
         this.displayMessage("La liste a été mise à jour");
       });
 
     this.deleteListSubject
       .pipe(
         tap(() => this.setLoading(true)),
-        switchMap((list) => this.deleteTodoList(list)),
-        switchMap(() => this.getList()),
+        switchMap((list) =>
+          this.deleteTodoList(list)
+            .pipe(
+              map(() => this.removeList(list.ID))
+            )
+        ),
         takeUntilDestroyed(),
-      ).subscribe(list => {
-        this.setLists(list);
+      ).subscribe(() => {
         this.displayMessage("La liste à été effacée");
       });
   }
@@ -71,8 +74,12 @@ export class TodoListService {
   }
 
   // List API
-  private getList() {
-    return this.http.get<List[]>(`${environment.baseUrl}/lists`)
+  private getList(id?: number) {
+    let url = `${environment.baseUrl}/lists`;
+    if (id) {
+      url = `${environment.baseUrl}/list/${id}`
+    }
+    return this.http.get<List[]>(url)
     .pipe(
       tap(() => this.setLoading(true)),
       mergeMap(lists =>
@@ -92,7 +99,7 @@ export class TodoListService {
     );
   }
 
-  private updateList(list: List): Observable<List> {
+  private updateList(list: List): Observable<{id: number}> {
     let obs$;
     if (list.ID) {
       obs$ = this.http.put<List>(`${environment.baseUrl}/list/${list.ID}`, {name: list.name});
@@ -120,5 +127,21 @@ export class TodoListService {
       lists: lists,
       isLoading: false
     }));
+  }
+
+  private addToList(list: List[]) {
+    this.listState.update(state => ({
+      ...state,
+      lists: [...this.listState().lists, list[0]],
+      isLoading: false
+    }));
+  }
+
+  private removeList(id: number) {
+    this.listState.update(state => ({
+      ...state,
+      lists: this.listState().lists.filter(list => list.ID !== id),
+      isLoading: false
+    }))
   }
 }

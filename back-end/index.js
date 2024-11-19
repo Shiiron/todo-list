@@ -8,7 +8,7 @@ const db = new sqlite3.Database("./database/todo-list.db", sqlite3.OPEN_READWRIT
 app.use(express.json());
 app.use(cors());
 
-// API Endpoints
+// LIST Endpoints
 app.get('/lists', (req, res) => {
   db.all('SELECT * FROM list', [], (err, rows) => {
     if (err) {
@@ -19,15 +19,15 @@ app.get('/lists', (req, res) => {
   });
 });
 
-app.get('/tasks/:listid', (req, res) => {
-  const { listid } = req.params;
-  db.all('SELECT * FROM task WHERE list_id = ?', [listid], (err, rows) => {
+app.get('/list/:id', (req, res) => {
+  const { id } = req.params;
+  db.all('SELECT * FROM list WHERE id = ?', [id], (err, rows) => {
     if (err) {
       res.status(500).send(err.message);
     } else {
       res.json(rows);
     }
-  })
+  });
 });
 
 app.post('/list', (req, res) => {
@@ -39,6 +39,42 @@ app.post('/list', (req, res) => {
       res.status(201).json({ id: this.lastID });
     }
   });
+});
+
+app.put('/list/:id', (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+  db.run('UPDATE list SET name = ? WHERE id = ?', [name, id], (err) => {
+    if (err) {
+      res.status(500).send(err.message);
+    } else {
+      res.status(201).json({ id, name });
+    }
+  });
+});
+
+app.delete('/list/:id', (req, res) => {
+  const { id } = req.params;
+  db.run('DELETE FROM list WHERE id = ?', [id], function (err) {
+    if (err) {
+      res.status(500).send(err.message);
+    } else {
+      res.status(204).send({ id: id });
+    }
+  });
+});
+
+
+// TASK ENDPOINT
+app.get('/tasks/:listid', (req, res) => {
+  const { listid } = req.params;
+  db.all('SELECT * FROM task WHERE list_id = ?', [listid], (err, rows) => {
+    if (err) {
+      res.status(500).send(err.message);
+    } else {
+      res.json(rows);
+    }
+  })
 });
 
 app.post('/task/:listid', (req, res) => {
@@ -54,18 +90,6 @@ app.post('/task/:listid', (req, res) => {
   })
 });
 
-app.put('/list/:id', (req, res) => {
-  const { id } = req.params;
-  const { name } = req.body;
-  db.run('UPDATE list SET name = ? WHERE id = ?', [name, id], (err) => {
-    if (err) {
-      res.status(500).send(err.message);
-    } else {
-      res.status(201).json({ id, name });
-    }
-  });
-});
-
 app.put('/task/:id', (req, res) => {
   const { id } = req.params;
   const { description } = req.body;
@@ -73,17 +97,6 @@ app.put('/task/:id', (req, res) => {
   db.run('UPDATE task SET description = ? WHERE id = ?', [description, id], (err) => {
     err ? res.status(500).send(err.message) : res.status(201).json({ id: id, description: description });
   })
-});
-
-app.delete('/list/:id', (req, res) => {
-  const { id } = req.params;
-  db.run('DELETE FROM list WHERE id = ?', [id], function (err) {
-    if (err) {
-      res.status(500).send(err.message);
-    } else {
-      res.status(204).send({ id: id });
-    }
-  });
 });
 
 app.delete('/task/:id', (req, res) => {
