@@ -1,17 +1,16 @@
-import { Component, DestroyRef, inject, Signal, signal } from '@angular/core';
-import { TodoListService } from 'src/app/services/todo-list.service';
+import { Component, inject, signal } from '@angular/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule} from '@angular/material/input';
 import { MatDividerModule } from '@angular/material/divider';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { List } from 'src/app/model/list';
-import { TodoTaskService } from 'src/app/services/todo-task.service';
 import { TaskComponent } from '../task/task.component';
 import { MatIconModule } from '@angular/material/icon';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { NgIf } from '@angular/common';
+import { TodoStateService } from 'src/app/services/todo-state.service';
 
 @Component({
   selector: 'app-list',
@@ -32,19 +31,13 @@ import { NgIf } from '@angular/common';
   styleUrls: ['./list.component.scss']
 })
 export class ListComponent {
-  todoListService = inject(TodoListService);
-  taskService = inject(TodoTaskService);
+  todoListStateService = inject(TodoStateService);
   addList: FormGroup;
   addTask = signal(false);
-  lists = this.todoListService.todoLists;
-  isLoading = this.todoListService.isLoading;
-  selectedList: number;
-  error: string;
+  lists = this.todoListStateService.todoLists;
+  isLoading = this.todoListStateService.isLoading;
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private destroyRef: DestroyRef
-  ) {}
+  constructor() {}
 
   toggleAddTask() {
     this.addTask.set(!this.addTask());
@@ -55,6 +48,6 @@ export class ListComponent {
   }
 
   deleteList(list: List) {
-    this.todoListService.deleteList(list);
+    this.todoListStateService.deleteList(list);
   }
 }

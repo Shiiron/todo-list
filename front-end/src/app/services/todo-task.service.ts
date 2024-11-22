@@ -10,10 +10,6 @@ import { TodoTask } from '../model/task';
 export class TodoTaskService {
   private http = inject(HttpClient);
 
-  taskState = signal({
-    tasks: []
-  })
-
   constructor() {}
 
   // Task API
@@ -25,18 +21,11 @@ export class TodoTaskService {
     return this.http.get<TodoTask[]>(`${environment.baseUrl}/tasks/${list_id}`);
   }
 
-
   updateTask(id: number, description: string) {
     return this.http.put<Task>(`${environment.baseUrl}/task/${id}`, {description: description})
   }
 
   deleteTask(id: number) {
     return this.http.delete<Task>(`${environment.baseUrl}/task/${id}`);
-  }
-
-  setTasks(tasks: TodoTask[]) {
-    this.taskState.update(() => ({
-      tasks: tasks
-    }))
   }
 }

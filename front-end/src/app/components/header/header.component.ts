@@ -1,10 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import {MatIconModule} from '@angular/material/icon';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { TodoListService } from 'src/app/services/todo-list.service';
+import { TodoStateService } from 'src/app/services/todo-state.service';
 
 @Component({
   selector: 'app-header',
@@ -15,13 +15,14 @@ import { TodoListService } from 'src/app/services/todo-list.service';
 })
 
 export class HeaderComponent {
-  todoListService = inject(TodoListService);
+  todoListStateService = inject(TodoStateService);
   addListForm: FormGroup = this.formBuilder.group({ name: null });
+  toggleAddList = signal(false);
 
   constructor(private formBuilder: FormBuilder) {}
 
   createList() {
       const newList = {ID: null, name: this.addListForm.value['name']};
-      this.todoListService.addNewList(newList);
+      this.todoListStateService.addNewList(newList);
   }
 }
