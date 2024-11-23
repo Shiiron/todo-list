@@ -1,0 +1,32 @@
+<div class="list-item">
+  <div class="list-title">
+    {{ list.name }}
+    <button mat-icon-button (click)="deleteList(list)">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="list-task-container">
+    @for (task of list.tasks; track $index) {
+      <app-task [task]="task"></app-task>
+    }
+
+    @if (addTask) {
+      <div>
+        <form [formGroup]="addList" (ngSubmit)="submit()">
+          <mat-form-field>
+            <mat-label>Nom de la liste</mat-label>
+            <input matInput name="name" formControlName="name">
+          </mat-form-field>
+
+          <input mat-flat-button type="submit" />
+        </form>
+      </div>
+    }
+  </div>
+
+  <div class="list-footer">
+    <!-- <button mat-raised-button>Voir plus</button> -->
+    <button mat-raised-button (click)="toggleAddTask()">Ajouter une tâche</button>
+  </div>
+</div>

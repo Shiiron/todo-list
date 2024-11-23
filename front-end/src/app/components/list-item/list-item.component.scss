@@ -1,0 +1,21 @@
+.list-title {
+  padding: 1rem;
+  font-weight: 700;
+  color: var(--dark-blue);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.list-footer {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.list-item {
+  height: 100%;
+  display: grid;
+  grid-template-rows: max-content 1fr max-content;
+}

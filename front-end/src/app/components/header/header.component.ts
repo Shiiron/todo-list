@@ -15,7 +15,7 @@ import { TodoStateService } from 'src/app/services/todo-state.service';
 })
 
 export class HeaderComponent {
-  todoListStateService = inject(TodoStateService);
+  private todoListStateService = inject(TodoStateService);
   addListForm: FormGroup = this.formBuilder.group({ name: null });
   toggleAddList = signal(false);
 

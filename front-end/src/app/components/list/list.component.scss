@@ -8,21 +8,4 @@
   border-radius: 25px;
   border: 3px var(--dark-blue) solid;
   display: grid;
-  grid-template-rows: max-content 1fr max-content;
-}
-
-.list-title {
-  padding: 1rem;
-  font-weight: 700;
-  color: var(--dark-blue);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.list-footer {
-  padding: 1.5rem;
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
 }
