@@ -11,15 +11,14 @@
       <app-task [task]="task"></app-task>
     }
 
+    <!-- Allow multiple task to be added -->
     @if (addTask) {
       <div>
-        <form [formGroup]="addList" (ngSubmit)="submit()">
+        <form [formGroup]="addList">
           <mat-form-field>
-            <mat-label>Nom de la liste</mat-label>
+            <mat-label>Description de la tâche</mat-label>
             <input matInput name="name" formControlName="name">
           </mat-form-field>
-
-          <input mat-flat-button type="submit" />
         </form>
       </div>
     }
@@ -28,5 +27,8 @@
   <div class="list-footer">
     <!-- <button mat-raised-button>Voir plus</button> -->
     <button mat-raised-button (click)="toggleAddTask()">Ajouter une tâche</button>
+    @if(addTask) {
+      <button (click)="sendForm()" mat-flat-button>Créer les tâches</button>
+    }
   </div>
 </div>

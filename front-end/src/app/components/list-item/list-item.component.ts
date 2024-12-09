@@ -1,11 +1,12 @@
-import { Component, inject, Input } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Component, ElementRef, inject, Input, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, NgForm, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { TaskComponent } from '../task/task.component';
 import { List } from 'src/app/model/list';
 import { TodoStateService } from 'src/app/services/todo-state.service';
 import { MatIconModule } from '@angular/material/icon';
+import { TodoTask } from 'src/app/model/task';
 
 @Component({
   selector: 'app-list-item',
@@ -16,13 +17,16 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class ListItemComponent {
   @Input() list: List;
+  @ViewChild('taskForm') taskForm: NgForm;
   private todoListStateService = inject(TodoStateService);
 
   addTask = false;
   addList: FormGroup;
 
   constructor(private formBuilder: FormBuilder) {
-    this.addList = this.formBuilder.group({ name: ''});
+    this.addList = this.formBuilder.group({
+      name: ['', Validators.required]
+    });
   }
 
   toggleAddTask() {
@@ -33,5 +37,14 @@ export class ListItemComponent {
     this.todoListStateService.deleteList(list);
   }
 
-  submit() {}
+  sendForm() {
+    if (this.addList.valid) {
+      this.toggleAddTask();
+      let task: TodoTask = {ID: null, description: this.addList.controls['name'].value, list_id: this.list.ID};
+      this.todoListStateService.updateTask(task);
+      this.addList.controls['name'].setValue('');
+    } else {
+      // Trigger validation messages
+    }
+  }
 }

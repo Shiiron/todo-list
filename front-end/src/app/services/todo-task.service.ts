@@ -12,20 +12,22 @@ export class TodoTaskService {
 
   constructor() {}
 
-  // Task API
-  addTask(list_id: number, description: string): Observable<Task> {
-    return this.http.post<Task>(`${environment.baseUrl}/task/${list_id}`,{description: description});
-  }
-
   getTask(list_id: number) {
     return this.http.get<TodoTask[]>(`${environment.baseUrl}/tasks/${list_id}`);
   }
 
-  updateTask(id: number, description: string) {
-    return this.http.put<Task>(`${environment.baseUrl}/task/${id}`, {description: description})
+  updateTask(task: TodoTask): Observable<TodoTask> {
+    let obs$;
+    if (task.ID) {
+      obs$ = this.http.put<TodoTask>(`${environment.baseUrl}/task/${task.ID}`, {description: task.description})
+    } else {
+      obs$ = this.http.post<TodoTask>(`${environment.baseUrl}/task/${task.list_id}`,{description: task.description});
+    }
+
+    return obs$;
   }
 
   deleteTask(id: number) {
-    return this.http.delete<Task>(`${environment.baseUrl}/task/${id}`);
+    return this.http.delete<TodoTask>(`${environment.baseUrl}/task/${id}`);
   }
 }

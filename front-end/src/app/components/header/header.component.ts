@@ -22,7 +22,13 @@ export class HeaderComponent {
   constructor(private formBuilder: FormBuilder) {}
 
   createList() {
-      const newList = {ID: null, name: this.addListForm.value['name']};
-      this.todoListStateService.addNewList(newList);
+    const newList = {ID: null, name: this.addListForm.value['name']};
+    this.todoListStateService.addNewList(newList);
+    this.clearFields();
+  }
+
+  clearFields() {
+    // TODO : When service is succesfull, empty form field
+    this.addListForm.setValue({name: null});
   }
 }

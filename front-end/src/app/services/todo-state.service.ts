@@ -1,5 +1,5 @@
 import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
-import { map, of, Subject, switchMap, tap } from 'rxjs';
+import { combineLatest, map, of, Subject, switchMap, tap, withLatestFrom } from 'rxjs';
 import { List } from '../model/list';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TodoTaskService } from './todo-task.service';
@@ -46,7 +46,7 @@ export class TodoStateService {
       tap(() => this.setLoading(true)),
       switchMap((list: List) => this.todoListService.updateList(list)),
       switchMap((id: {id: number}) => this.todoListService.getList(id.id)),
-      takeUntilDestroyed(this.destroyRef),
+      takeUntilDestroyed(),
     ).subscribe(list => {
       this.addToList(list);
       this.displayMessage("La liste a été mise à jour");
@@ -63,6 +63,28 @@ export class TodoStateService {
     ).subscribe(() => {
       this.displayMessage("La liste à été effacée");
     });
+
+    this.updateTaskSubject
+    .pipe(
+      tap(() => this.setLoading(true)),
+      switchMap((task: TodoTask) => this.taskService.updateTask(task)),
+      takeUntilDestroyed()
+    ).subscribe((task) => {
+      this.addTaskToList(task);
+      this.displayMessage("La tâche a été créé");
+    })
+
+    this.deleteTaskSubject
+    .pipe(
+      tap(() => this.setLoading(true)),
+      switchMap((task: TodoTask) => this.taskService.deleteTask(task.ID)
+        .pipe(
+          map(() => this.removeTaskFromList(task))
+        )),
+      takeUntilDestroyed()
+    ).subscribe(() => {
+      this.displayMessage("La tâche a été supprimé");
+    })
   }
 
   addNewList(list: List) {
@@ -114,9 +136,27 @@ export class TodoStateService {
   }
 
   // Task management
-  private addTaskToList() {}
+  private addTaskToList(task: TodoTask) {
+    let updatedList = this.listState().lists.find(list => list.ID === +task.list_id);
+    updatedList.tasks = [...updatedList.tasks, task];
 
-  private removeTaskFromList() {}
+    this.listState.update(state => ({
+      ...state,
+      lists: this.listState().lists,
+      isLoading: false
+    }));
+  }
+
+  private removeTaskFromList(task: TodoTask) {
+    let updatedList = this.listState().lists.find(list => list.ID === task.list_id);
+    updatedList.tasks = updatedList.tasks.filter(t => t.ID !== task.ID);
+
+    this.listState.update(state => ({
+      ...state,
+      lists: this.listState().lists,
+      isLoading: false
+    }));
+  }
 
   displayMessage(message: string) {
     this.snackService.open(message, null, {duration: 3000});

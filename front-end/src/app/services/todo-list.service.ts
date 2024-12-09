@@ -36,7 +36,7 @@ export class TodoListService {
             map(tasks => ({
               ID: list.ID,
               name: list.name,
-              tasks: tasks.map(t => ({ID: t.ID, description: t.description} as TodoTask))
+              tasks: tasks.map(t => ({ID: t.ID, description: t.description, list_id: list.ID} as TodoTask))
             } as List))
           )
         )

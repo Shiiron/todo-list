@@ -85,7 +85,7 @@ app.post('/task/:listid', (req, res) => {
     if (err) {
       res.status(500).send(err.message);
     } else {
-      res.status(201).json({ id: this.lastID });
+      res.status(201).json({ id: this.lastID, list_id: listid, description: description });
     }
   })
 });

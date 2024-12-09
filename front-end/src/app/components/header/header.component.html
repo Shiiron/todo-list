@@ -9,12 +9,13 @@
   </div>
 </header>
 
-@if(this.toggleAddList()) {
+@if(toggleAddList()) {
   <form class="add-list-form" [formGroup]="addListForm" (ngSubmit)="createList()">
     <mat-form-field>
       <mat-label>Nom de la liste</mat-label>
       <input matInput name="name" formControlName="name">
     </mat-form-field>
-    <input type="submit">
+    <button mat-flat-button>Envoyer</button>
+    <button type="button" mat-button (click)="toggleAddList.set(false); clearFields()">Annuler</button>
   </form>
 }
