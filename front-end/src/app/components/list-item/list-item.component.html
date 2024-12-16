@@ -17,8 +17,11 @@
         <form [formGroup]="addList">
           <mat-form-field>
             <mat-label>Description de la tâche</mat-label>
-            <input matInput name="name" formControlName="name">
+            <input matInput id="name" formControlName="name">
           </mat-form-field>
+          @if(addList.get('name').invalid && (addList.get('name').touched || addList.get('name').dirty)) {
+            <div style="color: red">Veuillez renseigner ce champ !</div>
+          }
         </form>
       </div>
     }
@@ -26,9 +29,11 @@
 
   <div class="list-footer">
     <!-- <button mat-raised-button>Voir plus</button> -->
-    <button mat-raised-button (click)="toggleAddTask()">Ajouter une tâche</button>
     @if(addTask) {
       <button (click)="sendForm()" mat-flat-button>Créer les tâches</button>
+      <button mat-raised-button (click)="cancel()">Annuler</button>
+    } @else {
+      <button mat-raised-button (click)="toggleAddTask()">Ajouter une tâche</button>
     }
   </div>
 </div>

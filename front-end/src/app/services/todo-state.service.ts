@@ -1,5 +1,5 @@
 import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
-import { combineLatest, map, of, Subject, switchMap, tap, withLatestFrom } from 'rxjs';
+import { map, of, Subject, switchMap, tap } from 'rxjs';
 import { List } from '../model/list';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TodoTaskService } from './todo-task.service';
@@ -11,7 +11,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   providedIn: 'root'
 })
 export class TodoStateService {
-  private destroyRef = inject(DestroyRef);
   // initial State for service
   private listState = signal<{lists: List[]; isLoading: boolean}>({
     lists: [],

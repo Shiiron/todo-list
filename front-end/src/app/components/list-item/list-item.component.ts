@@ -1,5 +1,5 @@
-import { Component, ElementRef, inject, Input, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, NgForm, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, Input, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, NgForm, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { TaskComponent } from '../task/task.component';
@@ -38,13 +38,17 @@ export class ListItemComponent {
   }
 
   sendForm() {
+    this.addList.markAllAsTouched();
     if (this.addList.valid) {
       this.toggleAddTask();
       let task: TodoTask = {ID: null, description: this.addList.controls['name'].value, list_id: this.list.ID};
       this.todoListStateService.updateTask(task);
       this.addList.controls['name'].setValue('');
-    } else {
-      // Trigger validation messages
     }
+  }
+
+  cancel() {
+    this.addList.reset();
+    this.toggleAddTask();
   }
 }
